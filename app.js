@@ -54,7 +54,7 @@ function initNew() {
   newPar3 = new Set([3, 6, 12, 16]);
   document.getElementById('g-date').value = new Date().toISOString().slice(0, 10);
   document.getElementById('g-course').value = '';
-  document.getElementById('g-denom').value = '1';
+  document.getElementById('g-denom').value = '0.25';
   renderChips();
   renderPar3Grid();
 }

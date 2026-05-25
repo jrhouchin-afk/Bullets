@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bullets</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    :root {
+      --color-bg: #f8f6f1;
+      --color-surface: #ffffff;
+      --color-border: #e2ddd6;
+      --color-border-light: #ede9e2;
+      --color-text: #1a1917;
+      --color-text-secondary: #6b6863;
+      --color-text-danger: #b91c1c;
+      --color-border-danger: #fca5a5;
+      --color-green-bg: #eaf3de;
+      --color-green-text: #3b6d11;
+      --color-green-border: #c0dd97;
+      --color-amber-bg: #faeeda;
+      --color-amber-text: #633806;
+      --color-amber-border: #fac775;
+      --color-amber-dark: #412402;
+      --color-blue-bg: #e6f1fb;
+      --color-blue-text: #0c447c;
+      --color-gray-bg: #f1efe8;
+      --color-gray-text: #444441;
+      --radius-sm: 8px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--color-bg); }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; color: var(--color-text); }
+    #app { max-width: 480px; margin: 0 auto; min-height: 100vh; }
+    .screen { display: none; padding: 1rem; padding-bottom: 2rem; }
+    .screen.active { display: block; }
+    h2 { font-size: 18px; font-weight: 600; margin-bottom: 1rem; }
+    .card { background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 0.75rem; }
+    label { font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 4px; }
+    input[type="text"], input[type="number"], input[type="date"] {
+      width: 100%; margin-bottom: 0.75rem; padding: 9px 12px;
+      border: 0.5px solid var(--color-border); border-radius: var(--radius-sm);
+      font-size: 15px; background: var(--color-bg); color: var(--color-text);
+      outline: none; appearance: none;
+    }
+    input:focus { border-color: var(--color-text); }
+    .btn {
+      width: 100%; padding: 11px; border: 0.5px solid var(--color-border);
+      border-radius: var(--radius-md); background: transparent; color: var(--color-text);
+      font-size: 14px; cursor: pointer; transition: opacity .15s;
+    }
+    .btn:active { opacity: 0.7; }
+    .btn-primary { background: var(--color-text); color: var(--color-surface); border-color: var(--color-text); }
+    .btn-sm { padding: 6px 12px; font-size: 13px; width: auto; }
+    .btn-danger { border-color: var(--color-border-danger); color: var(--color-text-danger); }
+    .btn-muted { color: var(--color-text-secondary); font-size: 13px; }
+    .row { display: flex; align-items: center; gap: 8px; }
+    .row-between { display: flex; align-items: center; justify-content: space-between; }
+    .divider { height: 0.5px; background: var(--color-border-light); margin: 0.75rem 0; }
+    .pill { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 99px; }
+    .pill-green { background: var(--color-green-bg); color: var(--color-green-text); }
+    .pill-amber { background: var(--color-amber-bg); color: var(--color-amber-text); }
+    .pill-blue { background: var(--color-blue-bg); color: var(--color-blue-text); }
+    .pill-gray { background: var(--color-gray-bg); color: var(--color-gray-text); }
+    .seclabel { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .06em; margin: 1rem 0 .5rem; }
+    .player-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 99px; border: 0.5px solid var(--color-border); font-size: 13px; margin: 3px; cursor: pointer; background: var(--color-bg); color: var(--color-text); transition: all .15s; }
+    .player-chip.sel { background: var(--color-text); color: var(--color-surface); border-color: var(--color-text); }
+    .hole-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+    .hbtn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 0.5px solid var(--color-border); font-size: 13px; font-weight: 500; cursor: pointer; background: var(--color-bg); color: var(--color-text); transition: all .15s; }
+    .hbtn.par3 { background: var(--color-blue-bg); color: var(--color-blue-text); border-color: #b5d4f4; }
+    .stake-box { background: var(--color-amber-bg); border: 0.5px solid var(--color-amber-border); border-radius: var(--radius-md); padding: .75rem 1rem; margin-bottom: .75rem; }
+    .hole-nav { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 1rem; scrollbar-width: none; -ms-overflow-style: none; }
+    .hole-nav::-webkit-scrollbar { display: none; }
+    .hn { min-width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); font-size: 12px; border: 0.5px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; flex-shrink: 0; transition: all .15s; }
+    .hn.done { background: var(--color-green-bg); color: var(--color-green-text); border-color: var(--color-green-border); }
+    .hn.done-p3 { background: var(--color-amber-bg); color: #854f0b; border-color: var(--color-amber-border); }
+    .hn.active { border: 1.5px solid var(--color-text); color: var(--color-text); font-weight: 600; }
+    .hn.carryover { background: var(--color-gray-bg); color: var(--color-gray-text); border-color: #d3d1c7; }
+    .bullet-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--color-border-light); }
+    .bullet-row:last-child { border-bottom: none; }
+    .player-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: .5rem; }
+    .pbtn { flex: 1; min-width: calc(50% - 3px); padding: 10px 6px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); background: transparent; color: var(--color-text); font-size: 13px; cursor: pointer; text-align: center; transition: opacity .15s; }
+    .pbtn:active { opacity: 0.7; }
+    .pbtn:disabled { opacity: .35; cursor: not-allowed; }
+    .sc-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+    .sc-table th, .sc-table td { text-align: center; padding: 5px 2px; border: 0.5px solid var(--color-border); }
+    .sc-table th { background: var(--color-bg); font-weight: 600; font-size: 11px; color: var(--color-text-secondary); }
+    .sc-table .pcol { text-align: left; padding-left: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 58px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 1rem; }
+    .stat-card { background: var(--color-bg); border-radius: var(--radius-md); padding: .75rem 1rem; border: 0.5px solid var(--color-border); }
+    .stat-card .val { font-size: 22px; font-weight: 600; }
+    .stat-card .lbl { font-size: 12px; color: var(--color-text-secondary); }
+    .pos { color: var(--color-green-text); }
+    .neg { color: #a32d2d; }
+    .page-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <div id="s-home" class="screen active">
+    <div class="page-header">
+      <i class="ti ti-golf" style="font-size:24px;color:var(--color-text-secondary)"></i>
+      <h2 style="margin:0">Bullets</h2>
+    </div>
+    <button class="btn btn-primary" onclick="nav('s-new')"><i class="ti ti-plus"></i> New game</button>
+    <div id="recent-list"></div>
+  </div>
+
+  <!-- NEW GAME -->
+  <div id="s-new" class="screen">
+    <div class="row" style="margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="nav('s-home')" style="width:auto"><i class="ti ti-arrow-left"></i></button>
+      <h2 style="margin:0">New game</h2>
+    </div>
+    <div class="card">
+      <label>Date</label><input type="date" id="g-date">
+      <label>Course (optional)</label><input type="text" id="g-course" placeholder="e.g. Pine Valley">
+      <label>$ per bullet (denomination)</label><input type="number" id="g-denom" value="1" min="0.25" step="0.25" style="margin-bottom:0">
+    </div>
+    <div class="seclabel">Players</div>
+    <div class="card">
+      <div id="saved-chips"></div>
+      <div class="divider"></div>
+      <div class="row">
+        <input type="text" id="new-pname" placeholder="Add new player" style="flex:1;margin:0">
+        <button class="btn btn-sm" onclick="addPlayer()" style="margin-left:6px">Add</button>
+      </div>
+      <div id="sel-list" style="margin-top:.75rem"></div>
+    </div>
+    <div class="seclabel">Par 3 holes</div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:.75rem">Tap to mark as par 3</p>
+      <div class="hole-grid" id="par3-grid"></div>
+    </div>
+    <button class="btn btn-primary" onclick="startGame()" style="margin-top:.5rem">Start game</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="s-game" class="screen">
+    <div class="row-between" style="margin-bottom:.75rem">
+      <div class="row">
+        <button class="btn btn-sm" onclick="nav('s-home')" style="width:auto"><i class="ti ti-arrow-left"></i></button>
+        <span id="g-title" style="font-size:15px;font-weight:600"></span>
+      </div>
+      <button class="btn btn-sm" onclick="nav('s-sc')">Scorecard</button>
+    </div>
+    <div class="hole-nav" id="hole-nav"></div>
+    <div id="hole-body"></div>
+  </div>
+
+  <!-- SCORECARD -->
+  <div id="s-sc" class="screen">
+    <div class="row" style="margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="nav('s-game')" style="width:auto"><i class="ti ti-arrow-left"></i></button>
+      <h2 style="margin:0">Scorecard</h2>
+    </div>
+    <div id="sc-body"></div>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -567,19 +567,132 @@ function navBtns() {
 }
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
+
+// Returns true if any hole after hi has bullets or par3 results recorded
+function hasSubsequentActivity(hi) {
+  for (let i = hi + 1; i < 18; i++) {
+    const hd = CG.holes[i];
+    if (hd.bullets.length > 0) return true;
+    if (hd.isPar3 && (hd.par3.winner !== null || hd.par3.validated === false)) return true;
+    if (hd.postP3Carry && (hd.postP3Carry.winner !== null || hd.postP3Carry.validated === false)) return true;
+  }
+  return false;
+}
+
+// Recalculate every stored bullet number across all holes in order.
+function recalcAllBullets() {
+  // Pass 1: reassign regular bullet numbers and par3 bullet numbers
+  let runB = 0;
+  CG.holes.forEach(hd => {
+    if (hd.isPar3) {
+      if (hd.par3.winner !== null || hd.par3.validated === false) {
+        if (hd.par3.winner !== null) hd.par3.bulletNum = runB + 1;
+        runB++;
+      }
+      hd.bullets.forEach(b => { b.num = runB + 1; runB++; });
+    } else {
+      hd.bullets.forEach(b => { b.num = runB + 1; runB++; });
+    }
+  });
+
+  // Pass 2: rebuild carry arrays to reflect updated numbers
+  let runB2 = 0;
+  const liveCarries = [];
+  CG.holes.forEach(hd => {
+    if (hd.isPar3) {
+      const p3Num = runB2 + 1;
+      if (hd.par3.winner !== null) {
+        hd.par3.carries = [...liveCarries];
+        runB2++;
+        runB2 += hd.bullets.length;
+        liveCarries.length = 0;
+      } else if (hd.par3.validated === false) {
+        liveCarries.push({ fromHole: hd.hole, bulletNum: p3Num });
+        runB2++;
+        runB2 += hd.bullets.length;
+      } else {
+        runB2 += hd.bullets.length;
+      }
+    } else {
+      if (hd.postP3Carry && hd.postP3Carry.winner !== null) {
+        hd.postP3Carry.carries = [...liveCarries];
+        liveCarries.length = 0;
+      }
+      runB2 += hd.bullets.length;
+    }
+  });
+}
+
 function addB(hi, player) {
   const hd = CG.holes[hi];
   if (hd.bullets.some(b => b.player === player)) return;
-  const num = nextRegBulletNum(hi);
-  hd.bullets.push({ num, player });
+  if (hasSubsequentActivity(hi)) {
+    showRetroConfirm(hi, player, 'add');
+    return;
+  }
+  hd.bullets.push({ num: nextRegBulletNum(hi), player });
   hd.confirmed = false;
   lsave(); renderGame();
 }
 
+function addBConfirmed(hi, player) {
+  const hd = CG.holes[hi];
+  if (hd.bullets.some(b => b.player === player)) return;
+  hd.bullets.push({ num: 0, player }); // placeholder; recalc sets correct num
+  hd.confirmed = false;
+  recalcAllBullets();
+  lsave(); renderGame();
+}
+
 function removeB(hi, bi) {
+  if (hasSubsequentActivity(hi)) {
+    showRetroConfirm(hi, bi, 'remove');
+    return;
+  }
   CG.holes[hi].bullets.splice(bi, 1);
   CG.holes[hi].confirmed = false;
   lsave(); renderGame();
+}
+
+function removeBConfirmed(hi, bi) {
+  CG.holes[hi].bullets.splice(bi, 1);
+  CG.holes[hi].confirmed = false;
+  recalcAllBullets();
+  lsave(); renderGame();
+}
+
+function showRetroConfirm(hi, arg, action) {
+  const el = document.getElementById('hole-body');
+  const holesAfter = CG.holes.slice(hi + 1).filter(hd =>
+    hd.bullets.length > 0 ||
+    (hd.isPar3 && (hd.par3.winner !== null || hd.par3.validated === false)) ||
+    (hd.postP3Carry && hd.postP3Carry.winner !== null)
+  ).length;
+
+  const actionLabel = action === 'add'
+    ? `Add a bullet for <strong style="color:var(--color-amber-text)">${esc(String(arg))}</strong> on hole ${hi + 1}`
+    : `Remove a bullet on hole ${hi + 1}`;
+
+  const confirmFn = action === 'add'
+    ? `addBConfirmed(${hi},'${escQ(String(arg))}')`
+    : `removeBConfirmed(${hi},${arg})`;
+
+  el.innerHTML = `
+    <div class="card" style="border-color:var(--color-amber-border);background:var(--color-amber-bg)">
+      <div style="font-size:15px;font-weight:600;color:var(--color-amber-text);margin-bottom:.5rem">
+        <i class="ti ti-alert-triangle" style="vertical-align:-2px;margin-right:4px"></i>Retroactive change
+      </div>
+      <div style="font-size:14px;color:var(--color-amber-text);margin-bottom:.75rem">
+        ${actionLabel}.<br><br>
+        <strong>${holesAfter} subsequent hole${holesAfter === 1 ? '' : 's'}</strong> with bullets already recorded.
+        All bullet numbers from hole ${hi + 2} onward will be recalculated.
+      </div>
+      <div class="row" style="gap:8px">
+        <button class="btn" onclick="renderGame()" style="flex:1">Cancel</button>
+        <button class="btn btn-primary" onclick="${confirmFn}" style="flex:1">Confirm &amp; recalculate</button>
+      </div>
+    </div>
+    ${navBtns()}`;
 }
 
 function confirmHole(hi) {

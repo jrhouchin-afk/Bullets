@@ -71,9 +71,8 @@
     .hbtn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); border: 0.5px solid var(--color-border); font-size: 13px; font-weight: 500; cursor: pointer; background: var(--color-bg); color: var(--color-text); transition: all .15s; }
     .hbtn.par3 { background: var(--color-blue-bg); color: var(--color-blue-text); border-color: #b5d4f4; }
     .stake-box { background: var(--color-amber-bg); border: 0.5px solid var(--color-amber-border); border-radius: var(--radius-md); padding: .75rem 1rem; margin-bottom: .75rem; }
-    .hole-nav { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 1rem; scrollbar-width: none; -ms-overflow-style: none; }
-    .hole-nav::-webkit-scrollbar { display: none; }
-    .hn { min-width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); font-size: 12px; border: 0.5px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; flex-shrink: 0; transition: all .15s; }
+    .hole-nav { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; margin-bottom: 1rem; }
+    .hn { height: 34px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); font-size: 12px; border: 0.5px solid var(--color-border); color: var(--color-text-secondary); cursor: pointer; transition: all .15s; }
     .hn.done { background: var(--color-green-bg); color: var(--color-green-text); border-color: var(--color-green-border); }
     .hn.done-p3 { background: var(--color-amber-bg); color: #854f0b; border-color: var(--color-amber-border); }
     .hn.active { border: 1.5px solid var(--color-text); color: var(--color-text); font-weight: 600; }

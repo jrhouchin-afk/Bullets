@@ -253,7 +253,7 @@ function renderGame() {
     const isDone = hd.confirmed;
     const isCarry = hd.isPar3 && hd.par3.validated === false && !isDone;
     const cls = active ? 'active ' : isDone ? (hd.isPar3 && hd.par3.winner ? 'done-p3' : 'done') : (isCarry ? 'carryover' : '');
-    navEl.innerHTML += `<div class="hn ${cls}" onclick="goH(${h})">${h}</div>`;
+    navEl.innerHTML += `<div class="hn ${cls}" onclick="goH(${h})" style="width:100%">${h}</div>`;
   });
   renderHole();
 }
